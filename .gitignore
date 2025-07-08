@@ -1,0 +1,6 @@
+.idea
+.env
+build
+test
+dist
+.DS_Store
