@@ -50,6 +50,8 @@ logLevel: info
 maxInboundPeers: 2000
 maxOutboundPeers: 20
 maxPacketMsgPayloadSize: 1024
+peerQueueSize: 1000
+dialWorkers: 20
 chainID: ""
 seeds: ""
 ```

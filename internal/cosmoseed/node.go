@@ -58,7 +58,12 @@ func NewSeeder(home string, config *Config) (*Seeder, error) {
 	book.SetLogger(logger)
 
 	// PEX Reactor
-	pexReactor := seedreactor.NewReactor(book, splitAndTrimEmpty(p2pConfig.Seeds, ",", " "))
+	pexReactor := seedreactor.NewReactor(
+		book,
+		splitAndTrimEmpty(p2pConfig.Seeds, ",", " "),
+		config.PeerQueueSize,
+		config.DialWorkers,
+	)
 	pexReactor.SetLogger(logger)
 
 	// p2p switch
@@ -85,7 +90,7 @@ func (s *Seeder) Start() error {
 	if err := s.cfg.Validate(); err != nil {
 		return err
 	}
-	
+
 	s.logger.Info("cosmoseed",
 		"version", Version,
 		"key", s.key.ID(),
@@ -96,6 +101,8 @@ func (s *Seeder) Start() error {
 		"max-inbound", s.cfg.MaxInboundPeers,
 		"max-outbound", s.cfg.MaxOutboundPeers,
 		"max-packet-msg-payload-size", s.cfg.MaxPacketMsgPayloadSize,
+		"dial-workers", s.cfg.DialWorkers,
+		"peer-queue-size", s.cfg.PeerQueueSize,
 	)
 
 	addr, err := na.NewFromString(na.IDAddrString(s.key.ID(), s.cfg.ListenAddr))

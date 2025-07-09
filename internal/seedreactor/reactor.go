@@ -2,6 +2,7 @@ package seedreactor
 
 import (
 	"fmt"
+	"time"
 
 	p2papi "github.com/cometbft/cometbft/api/cometbft/p2p/v1"
 	"github.com/cometbft/cometbft/v2/libs/log"
@@ -13,21 +14,38 @@ import (
 type SeedReactor struct {
 	*pex.Reactor
 
-	book pex.AddrBook
-	log  log.Logger
+	book        pex.AddrBook
+	log         log.Logger
+	addrChan    chan *na.NetAddr
+	quitCh      chan struct{}
+	dialWorkers int
 }
 
-func NewReactor(book pex.AddrBook, seeds []string) *SeedReactor {
+func NewReactor(book pex.AddrBook, seeds []string, queueSize, dialWorkers int) *SeedReactor {
 	r := pex.NewReactor(book, &pex.ReactorConfig{
-		SeedMode: true,
-		Seeds:    seeds,
+		SeedMode:          true,
+		Seeds:             seeds,
+		EnsurePeersPeriod: 30 * time.Second,
 	})
 
 	return &SeedReactor{
-		Reactor: r,
-		book:    book,
-		log:     log.NewNopLogger(),
+		Reactor:     r,
+		book:        book,
+		log:         log.NewNopLogger(),
+		addrChan:    make(chan *na.NetAddr, queueSize),
+		quitCh:      make(chan struct{}),
+		dialWorkers: dialWorkers,
 	}
+}
+
+func (s *SeedReactor) Start() error {
+	s.StartDialWorkers(s.dialWorkers)
+	return s.Reactor.Start()
+}
+
+func (s *SeedReactor) Stop() error {
+	close(s.quitCh)
+	return s.Reactor.Stop()
 }
 
 func (s *SeedReactor) SetLogger(logger log.Logger) {
@@ -67,35 +85,59 @@ func (s *SeedReactor) Receive(e p2p.Envelope) {
 
 		for _, addr := range addrs {
 			s.log.Debug("received peer address", "addr", addr.DialString())
-
-			if !addr.Routable() {
-				s.log.Debug("received peer address not routable. Ignoring", "addr", addr.DialString())
-				continue
+			select {
+			case s.addrChan <- addr:
+			default:
+				s.log.Warn("dial queue full, dropping address", "addr", addr.DialString())
 			}
-
-			if s.Switch.IsDialingOrExistingAddress(addr) {
-				s.log.Debug("received peer address already dialing", "addr", addr.DialString())
-				continue
-			}
-
-			go func() {
-				err := s.Reactor.Switch.DialPeerWithAddress(addr)
-				if err != nil {
-					s.log.Debug("dial failed", "addr", addr.DialString(), "err", err)
-					s.book.MarkAttempt(addr)
-					return
-				}
-
-				s.log.Info("adding/marking good peer", "id", addr.ID, "addr", addr)
-				if err = s.book.AddAddress(addr, e.Src.SocketAddr()); err != nil {
-					s.log.Error("failed to add address", "addr", addr, "err", err)
-					return
-				}
-				s.book.MarkGood(addr.ID)
-			}()
 		}
 
 	default:
 		s.log.Warn("received unknown PEX message type", "type", fmt.Sprintf("%T", msg))
 	}
+}
+
+func (s *SeedReactor) StartDialWorkers(n int) {
+	for i := 0; i < n; i++ {
+		go func() {
+			for {
+				select {
+				case addr := <-s.addrChan:
+					s.log.With("dial-worker", i).Debug("dialing peer", "peer", addr)
+					s.processAddr(addr)
+				case <-s.quitCh:
+					return
+				}
+			}
+		}()
+	}
+}
+
+func (s *SeedReactor) processAddr(addr *na.NetAddr) {
+	if addr == nil {
+		s.log.Debug("ignoring nil address")
+		return
+	}
+
+	if !addr.Routable() {
+		s.log.Debug("received peer address not routable. Ignoring", "addr", addr.DialString())
+		return
+	}
+
+	if s.Switch.IsDialingOrExistingAddress(addr) {
+		s.log.Debug("already dialing or connected", "addr", addr)
+		return
+	}
+	err := s.Reactor.Switch.DialPeerWithAddress(addr)
+	if err != nil {
+		s.log.Debug("dial failed", "addr", addr, "err", err)
+		s.book.MarkAttempt(addr)
+		return
+	}
+	s.log.Info("adding/marking good peer", "id", addr.ID, "addr", addr)
+	if err = s.book.AddAddress(addr, nil); err != nil {
+		s.log.Error("failed to add address", "addr", addr, "err", err)
+		return
+	}
+	s.book.MarkGood(addr.ID)
 }

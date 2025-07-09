@@ -20,6 +20,9 @@ type Config struct {
 	MaxOutboundPeers        int    `yaml:"maxOutboundPeers,omitempty" default:"20"`
 	MaxPacketMsgPayloadSize int    `yaml:"maxPacketMsgPayloadSize,omitempty" default:"1024"`
 
+	PeerQueueSize int `yaml:"peerQueueSize,omitempty" default:"1000"`
+	DialWorkers   int `yaml:"dialWorkers,omitempty" default:"20"`
+
 	ChainID string `yaml:"chainID"`
 	Seeds   string `yaml:"seeds"`
 }
