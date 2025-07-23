@@ -6,26 +6,26 @@ import (
 	"os"
 	"path"
 
-	"github.com/NibiruChain/cosmoseed/internal/cosmoseed"
+	cosmoseed2 "github.com/NibiruChain/cosmoseed/pkg/cosmoseed"
 )
 
 func main() {
 	flag.Parse()
 
 	if showVersion {
-		fmt.Printf("Version: %s\nCommit hash: %s\n", cosmoseed.Version, cosmoseed.CommitHash)
+		fmt.Printf("Version: %s\nCommit hash: %s\n", cosmoseed2.Version, cosmoseed2.CommitHash)
 		os.Exit(0)
 	}
 
 	cfgPath := path.Join(home, configFileName)
 
-	cfg, err := cosmoseed.ReadConfigFromFile(cfgPath)
+	cfg, err := cosmoseed2.ReadConfigFromFile(cfgPath)
 	if err != nil {
 		panic(err)
 	}
 
 	if cfg == nil {
-		cfg, err = cosmoseed.DefaultConfig()
+		cfg, err = cosmoseed2.DefaultConfig()
 		if err != nil {
 			panic(err)
 		}
@@ -47,7 +47,7 @@ func main() {
 		cfg.LogLevel = logLevel
 	}
 
-	seeder, err := cosmoseed.NewSeeder(home, cfg)
+	seeder, err := cosmoseed2.NewSeeder(home, cfg)
 	if err != nil {
 		panic(err)
 	}

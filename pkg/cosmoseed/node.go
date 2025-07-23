@@ -20,7 +20,7 @@ import (
 	tcpconn "github.com/cometbft/cometbft/v2/p2p/transport/tcp/conn"
 	"github.com/cometbft/cometbft/v2/version"
 
-	"github.com/NibiruChain/cosmoseed/internal/seedreactor"
+	"github.com/NibiruChain/cosmoseed/pkg/seedreactor"
 )
 
 type Seeder struct {

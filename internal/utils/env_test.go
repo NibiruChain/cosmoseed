@@ -1,10 +1,10 @@
-package environ_test
+package utils_test
 
 import (
 	"os"
 	"testing"
 
-	"github.com/NibiruChain/cosmoseed/internal/environ"
+	"github.com/NibiruChain/cosmoseed/internal/utils"
 )
 
 func TestEnviron(t *testing.T) {
@@ -20,15 +20,15 @@ func TestEnviron(t *testing.T) {
 		t.Fatalf("wrong initialization")
 	}
 
-	if environ.GetInt("integer", -1) != -1 {
+	if utils.GetInt("integer", -1) != -1 {
 		t.Fatalf("wanted -1")
 	}
 
-	if environ.GetUint64("unsigned", 10) != 10 {
+	if utils.GetUint64("unsigned", 10) != 10 {
 		t.Fatalf("wanted 10")
 	}
 
-	if environ.GetString("string", "example") != "example" {
+	if utils.GetString("string", "example") != "example" {
 		t.Fatalf("wanted example")
 	}
 
@@ -46,15 +46,15 @@ func TestEnviron(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if environ.GetInt("integer", -5) != -1 {
+	if utils.GetInt("integer", -5) != -1 {
 		t.Fatalf("wanted -1")
 	}
 
-	if environ.GetUint64("unsigned", 15) != 10 {
+	if utils.GetUint64("unsigned", 15) != 10 {
 		t.Fatalf("wanted 10")
 	}
 
-	if environ.GetString("string", "invalid") != "example" {
+	if utils.GetString("string", "invalid") != "example" {
 		t.Fatalf("wanted example")
 	}
 }

@@ -5,7 +5,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/NibiruChain/cosmoseed/internal/environ"
+	"github.com/NibiruChain/cosmoseed/internal/utils"
 )
 
 const (
@@ -24,22 +24,22 @@ func init() {
 
 	flag.StringVar(&home,
 		"home",
-		environ.GetString("HOME_DIR", defaultHome),
+		utils.GetString("HOME_DIR", defaultHome),
 		"path to home",
 	)
 	flag.StringVar(&chainID,
 		"chain-id",
-		environ.GetString("CHAIN_ID", ""),
+		utils.GetString("CHAIN_ID", ""),
 		"chain ID to use",
 	)
 	flag.StringVar(&seeds,
 		"seeds",
-		environ.GetString("SEEDS", ""),
+		utils.GetString("SEEDS", ""),
 		"seeds to use",
 	)
 	flag.StringVar(&logLevel,
 		"log-level",
-		environ.GetString("LOG_LEVEL", "info"),
+		utils.GetString("LOG_LEVEL", "info"),
 		"logging level",
 	)
 
