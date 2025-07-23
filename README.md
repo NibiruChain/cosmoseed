@@ -16,6 +16,7 @@ Unlike traditional seed implementations, Cosmoseed actively filters out unreacha
 - Maintains a strict and adaptive **address book** of peers
 - Fully configurable via `config.yaml` or command-line flags
 - Lightweight, single-binary deployment
+- Exposes a basic **HTTP endpoint** (`/peers`) to retrieve a randomized selection of known good peers
 
 ---
 
@@ -54,6 +55,7 @@ peerQueueSize: 1000
 dialWorkers: 20
 chainID: ""
 seeds: ""
+apiAddr: 0.0.0.0:8080
 ```
 
 Please note that `chainID` and `seeds` are required fields. You can either include them in the config file or pass them as command-line flags.
