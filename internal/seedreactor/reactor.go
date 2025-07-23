@@ -141,3 +141,7 @@ func (s *SeedReactor) processAddr(addr *na.NetAddr) {
 	}
 	s.book.MarkGood(addr.ID)
 }
+
+func (s *SeedReactor) GetPeerSelection() []*na.NetAddr {
+	return s.book.GetSelection()
+}

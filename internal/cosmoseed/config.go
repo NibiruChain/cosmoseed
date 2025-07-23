@@ -25,6 +25,8 @@ type Config struct {
 
 	ChainID string `yaml:"chainID"`
 	Seeds   string `yaml:"seeds"`
+
+	ApiAddr string `yaml:"apiAddr,omitempty" default:"0.0.0.0:8080"`
 }
 
 func (cfg *Config) Save(path string) error {

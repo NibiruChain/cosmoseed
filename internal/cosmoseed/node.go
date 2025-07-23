@@ -1,11 +1,15 @@
 package cosmoseed
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"path"
 	"syscall"
+	"time"
 
 	"github.com/cometbft/cometbft/v2/config"
 	"github.com/cometbft/cometbft/v2/libs/log"
@@ -27,7 +31,10 @@ type Seeder struct {
 
 	transport *tcp.MultiplexTransport
 	book      p2p.AddrBook
+	pex       *seedreactor.SeedReactor
 	sw        *p2p.Switch
+
+	httpServer *http.Server
 }
 
 func NewSeeder(home string, config *Config) (*Seeder, error) {
@@ -82,6 +89,7 @@ func NewSeeder(home string, config *Config) (*Seeder, error) {
 		key:       nodeKey,
 		transport: transport,
 		book:      book,
+		pex:       pexReactor,
 		sw:        sw,
 	}, nil
 }
@@ -119,7 +127,7 @@ func (s *Seeder) Start() error {
 	go func() {
 		<-sigChan
 		s.logger.Info("shutting down...")
-		if err := s.Stop(); err != nil {
+		if err = s.Stop(); err != nil {
 			panic(err)
 		}
 	}()
@@ -128,13 +136,33 @@ func (s *Seeder) Start() error {
 		return err
 	}
 
-	s.sw.Wait()
+	mux := http.NewServeMux()
+	s.registerRoutes(mux)
+
+	s.httpServer = &http.Server{
+		Addr:    s.cfg.ApiAddr,
+		Handler: mux,
+	}
+
+	s.logger.Info("HTTP server starting", "addr", s.httpServer.Addr)
+	if err = s.httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		s.logger.Error("HTTP server failed", "err", err)
+	}
 	return nil
 }
 
 func (s *Seeder) Stop() error {
 	s.book.Save()
-	return s.sw.Stop()
+	if err := s.sw.Stop(); err != nil {
+		return err
+	}
+	if s.httpServer != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		s.logger.Info("shutting down HTTP server")
+		return s.httpServer.Shutdown(ctx)
+	}
+	return nil
 }
 
 func (s *Seeder) GetNodeID() string {
