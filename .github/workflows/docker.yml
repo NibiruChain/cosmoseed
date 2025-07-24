@@ -115,7 +115,9 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ghcr.io/${{ github.repository }}
-          tags: ${{ needs.version.outputs.version }}
+          tags: |
+            type=raw,value=${{ needs.version.outputs.version }}
+            type=raw,value=latest
 
       - name: Create manifest list and push
         run: |
