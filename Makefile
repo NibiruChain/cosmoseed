@@ -4,7 +4,14 @@ BUILD_TARGETS := build install
 
 all: install
 
-$(BUILD_TARGETS):
+build:
+	CGO_ENABLED=0 go $@ \
+		-o build/ \
+		-mod=readonly \
+		-ldflags="-s -w -X github.com/NibiruChain/cosmoseed/internal/cosmoseed.Version=$(VERSION) -X github.com/NibiruChain/cosmoseed/internal/cosmoseed.CommitHash=$(COMMIT)" \
+		./cmd/cosmoseed
+
+install:
 	CGO_ENABLED=0 go $@ \
 		-mod=readonly \
 		-ldflags="-s -w -X github.com/NibiruChain/cosmoseed/internal/cosmoseed.Version=$(VERSION) -X github.com/NibiruChain/cosmoseed/internal/cosmoseed.CommitHash=$(COMMIT)" \
@@ -19,4 +26,4 @@ test: mod
 clean:
 	rm -rf $(BUILDDIR)/
 
-.PHONY: all $(BUILD_TARGETS) test clean
+.PHONY: all build install mod test clean
