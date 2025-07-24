@@ -44,8 +44,8 @@ func NewSeeder(home string, config *Config) (*Seeder, error) {
 	}
 	logger := log.NewFilter(log.NewLogger(os.Stdout), logOpt)
 
-	nodeKeyPath := path.Join(home, config.NodeKeyPath)
-	addrBookPath := path.Join(home, config.AddrBookPath)
+	nodeKeyPath := path.Join(home, config.NodeKeyFile)
+	addrBookPath := path.Join(home, config.AddrBookFile)
 
 	if err := ensurePath(nodeKeyPath); err != nil {
 		return nil, err
@@ -172,7 +172,7 @@ func (s *Seeder) GetNodeID() string {
 func generateP2PConfig(home string, cfg *Config) *config.P2PConfig {
 	p2pConfig := config.DefaultP2PConfig()
 
-	p2pConfig.AddrBook = path.Join(home, cfg.AddrBookPath)
+	p2pConfig.AddrBook = path.Join(home, cfg.AddrBookFile)
 	p2pConfig.AddrBookStrict = cfg.AddrBookStrict
 	p2pConfig.Seeds = cfg.Seeds
 	p2pConfig.ListenAddress = cfg.ListenAddr

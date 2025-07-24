@@ -47,6 +47,10 @@ func main() {
 		cfg.LogLevel = logLevel
 	}
 
+	if nodeKeyFile != "" {
+		cfg.NodeKeyFile = nodeKeyFile
+	}
+
 	seeder, err := cosmoseed2.NewSeeder(home, cfg)
 	if err != nil {
 		panic(err)

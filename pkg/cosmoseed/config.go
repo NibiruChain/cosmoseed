@@ -10,8 +10,8 @@ import (
 )
 
 type Config struct {
-	NodeKeyPath    string `yaml:"nodeKeyPath,omitempty" default:"nodekey.json"`
-	AddrBookPath   string `yaml:"addrBookPath,omitempty" default:"addrbook.json"`
+	NodeKeyFile    string `yaml:"nodeKeyFile,omitempty" default:"node_key.json"`
+	AddrBookFile   string `yaml:"addrBookFile,omitempty" default:"addrbook.json"`
 	AddrBookStrict bool   `yaml:"addrBookStrict,omitempty" default:"true"`
 
 	ListenAddr              string `yaml:"listenAddr,omitempty" default:"tcp://0.0.0.0:26656"`

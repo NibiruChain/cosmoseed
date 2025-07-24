@@ -43,8 +43,8 @@ By default, Cosmoseed reads its config from:
 If it does not exist, Cosmoseed will create a new configuration file with the following defaults:
 
 ```yaml
-nodeKeyPath: nodekey.json
-addrBookPath: addrbook.json
+nodeKeyFile: node_key.json
+addrBookFile: addrbook.json
 addrBookStrict: true
 listenAddr: tcp://0.0.0.0:26656
 logLevel: info

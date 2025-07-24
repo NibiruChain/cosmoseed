@@ -14,8 +14,8 @@ const (
 )
 
 var (
-	home, chainID, seeds, logLevel string
-	showVersion, showNodeID        bool
+	home, chainID, seeds, logLevel, nodeKeyFile string
+	showVersion, showNodeID                     bool
 )
 
 func init() {
@@ -41,6 +41,11 @@ func init() {
 		"log-level",
 		utils.GetString("LOG_LEVEL", "info"),
 		"logging level",
+	)
+	flag.StringVar(&nodeKeyFile,
+		"node-key-file",
+		utils.GetString("NODE_KEY_FILE", ""),
+		"override node key file on config.yaml",
 	)
 
 	flag.BoolVar(&showVersion, "version", false, "print version and exit")
