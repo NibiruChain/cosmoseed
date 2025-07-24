@@ -31,8 +31,10 @@ func main() {
 		}
 	}
 
-	if err = cfg.Save(cfgPath); err != nil {
-		panic(err)
+	if !configReadOnly {
+		if err = cfg.Save(cfgPath); err != nil {
+			panic(err)
+		}
 	}
 
 	if chainID != "" {

@@ -15,7 +15,7 @@ const (
 
 var (
 	home, chainID, seeds, logLevel, nodeKeyFile string
-	showVersion, showNodeID                     bool
+	showVersion, showNodeID, configReadOnly     bool
 )
 
 func init() {
@@ -50,4 +50,5 @@ func init() {
 
 	flag.BoolVar(&showVersion, "version", false, "print version and exit")
 	flag.BoolVar(&showNodeID, "show-node-id", false, "print node ID and exit")
+	flag.BoolVar(&configReadOnly, "config-read-only", false, "read-only mode for config file")
 }
