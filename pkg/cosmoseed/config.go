@@ -10,23 +10,23 @@ import (
 )
 
 type Config struct {
-	NodeKeyFile    string `yaml:"nodeKeyFile,omitempty" default:"node_key.json"`
-	AddrBookFile   string `yaml:"addrBookFile,omitempty" default:"addrbook.json"`
-	AddrBookStrict bool   `yaml:"addrBookStrict,omitempty" default:"true"`
+	NodeKeyFile    string `yaml:"nodeKeyFile" default:"node_key.json"`
+	AddrBookFile   string `yaml:"addrBookFile" default:"addrbook.json"`
+	AddrBookStrict bool   `yaml:"addrBookStrict" default:"true"`
 
-	ListenAddr              string `yaml:"listenAddr,omitempty" default:"tcp://0.0.0.0:26656"`
-	LogLevel                string `yaml:"logLevel,omitempty" default:"info"`
-	MaxInboundPeers         int    `yaml:"maxInboundPeers,omitempty" default:"2000"`
-	MaxOutboundPeers        int    `yaml:"maxOutboundPeers,omitempty" default:"20"`
-	MaxPacketMsgPayloadSize int    `yaml:"maxPacketMsgPayloadSize,omitempty" default:"1024"`
+	ListenAddr              string `yaml:"listenAddr" default:"tcp://0.0.0.0:26656"`
+	LogLevel                string `yaml:"logLevel" default:"info"`
+	MaxInboundPeers         int    `yaml:"maxInboundPeers" default:"2000"`
+	MaxOutboundPeers        int    `yaml:"maxOutboundPeers" default:"20"`
+	MaxPacketMsgPayloadSize int    `yaml:"maxPacketMsgPayloadSize" default:"1024"`
 
-	PeerQueueSize int `yaml:"peerQueueSize,omitempty" default:"1000"`
-	DialWorkers   int `yaml:"dialWorkers,omitempty" default:"20"`
+	PeerQueueSize int `yaml:"peerQueueSize" default:"1000"`
+	DialWorkers   int `yaml:"dialWorkers" default:"20"`
 
 	ChainID string `yaml:"chainID"`
 	Seeds   string `yaml:"seeds"`
 
-	ApiAddr string `yaml:"apiAddr,omitempty" default:"0.0.0.0:8080"`
+	ApiAddr string `yaml:"apiAddr" default:"0.0.0.0:8080"`
 }
 
 func (cfg *Config) Save(path string) error {
