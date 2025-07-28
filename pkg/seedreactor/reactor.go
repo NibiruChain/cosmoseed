@@ -19,9 +19,10 @@ type SeedReactor struct {
 	addrChan    chan *na.NetAddr
 	quitCh      chan struct{}
 	dialWorkers int
+	strict      bool
 }
 
-func NewReactor(book pex.AddrBook, seeds []string, queueSize, dialWorkers int) *SeedReactor {
+func NewReactor(book pex.AddrBook, seeds []string, queueSize, dialWorkers int, strict bool) *SeedReactor {
 	r := pex.NewReactor(book, &pex.ReactorConfig{
 		SeedMode:          true,
 		Seeds:             seeds,
@@ -35,6 +36,7 @@ func NewReactor(book pex.AddrBook, seeds []string, queueSize, dialWorkers int) *
 		addrChan:    make(chan *na.NetAddr, queueSize),
 		quitCh:      make(chan struct{}),
 		dialWorkers: dialWorkers,
+		strict:      strict,
 	}
 }
 
@@ -59,7 +61,7 @@ func (s *SeedReactor) AddPeer(p p2p.Peer) {
 		s.log.Warn("not adding peer: no address", "id", p.ID())
 		return
 	}
-	if !addr.Routable() {
+	if s.strict && !addr.Routable() {
 		s.log.Warn("not adding peer: address not routable", "id", p.ID(), "addr", addr)
 		return
 	}
@@ -119,7 +121,7 @@ func (s *SeedReactor) processAddr(addr *na.NetAddr) {
 		return
 	}
 
-	if !addr.Routable() {
+	if s.strict && !addr.Routable() {
 		s.log.Debug("received peer address not routable. Ignoring", "addr", addr.DialString())
 		return
 	}

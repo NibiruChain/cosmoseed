@@ -87,6 +87,7 @@ func NewSeeder(home string, config *Config) (*Seeder, error) {
 		splitAndTrimEmpty(p2pConfig.Seeds, ",", " "),
 		config.PeerQueueSize,
 		config.DialWorkers,
+		config.AddrBookStrict,
 	)
 	pexReactor.SetLogger(logger)
 
