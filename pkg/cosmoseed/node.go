@@ -47,6 +47,23 @@ func NewSeeder(home string, config *Config) (*Seeder, error) {
 	nodeKeyPath := path.Join(home, config.NodeKeyFile)
 	addrBookPath := path.Join(home, config.AddrBookFile)
 
+	logger.Debug("cosmoseed",
+		"version", Version,
+		"node-key-file", nodeKeyPath,
+		"address-book-file", addrBookPath,
+		"chain-id", config.ChainID,
+		"seeds", config.Seeds,
+		"api-addr", config.ApiAddr,
+		"p2p-addr", config.ListenAddr,
+		"log-level", config.LogLevel,
+		"strict-routing", config.AddrBookStrict,
+		"max-inbound", config.MaxInboundPeers,
+		"max-outbound", config.MaxOutboundPeers,
+		"max-packet-msg-payload-size", config.MaxPacketMsgPayloadSize,
+		"dial-workers", config.DialWorkers,
+		"peer-queue-size", config.PeerQueueSize,
+	)
+
 	if err := ensurePath(nodeKeyPath); err != nil {
 		return nil, err
 	}
@@ -99,18 +116,11 @@ func (s *Seeder) Start() error {
 		return err
 	}
 
-	s.logger.Info("cosmoseed",
+	s.logger.Info("starting cosmoseed node",
 		"version", Version,
 		"key", s.key.ID(),
 		"listen", s.cfg.ListenAddr,
-		"chain", s.cfg.ChainID,
-		"log-level", s.cfg.LogLevel,
-		"strict-routing", s.cfg.AddrBookStrict,
-		"max-inbound", s.cfg.MaxInboundPeers,
-		"max-outbound", s.cfg.MaxOutboundPeers,
-		"max-packet-msg-payload-size", s.cfg.MaxPacketMsgPayloadSize,
-		"dial-workers", s.cfg.DialWorkers,
-		"peer-queue-size", s.cfg.PeerQueueSize,
+		"chain-id", s.cfg.ChainID,
 	)
 
 	addr, err := na.NewFromString(na.IDAddrString(s.key.ID(), s.cfg.ListenAddr))
