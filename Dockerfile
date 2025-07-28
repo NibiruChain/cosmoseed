@@ -11,7 +11,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     CGO_ENABLED=0 go build -o cosmoseed ./cmd/cosmoseed
 
 FROM gcr.io/distroless/static:nonroot
-WORKDIR /
+WORKDIR /bin
 COPY --from=builder /workspace/cosmoseed .
 USER nonroot:nonroot
-ENTRYPOINT ["/cosmoseed"]
+ENTRYPOINT ["cosmoseed"]
