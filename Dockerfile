@@ -1,5 +1,7 @@
 FROM golang:1.24-alpine AS builder
 
+RUN apk add make git
+
 WORKDIR /workspace
 COPY go.mod go.sum* ./
 RUN --mount=type=cache,target=/go/pkg/mod \
@@ -8,10 +10,10 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 COPY . .
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg/mod \
-    CGO_ENABLED=0 go build -o cosmoseed ./cmd/cosmoseed
+    make build
 
 FROM gcr.io/distroless/static:nonroot
 WORKDIR /bin
-COPY --from=builder /workspace/cosmoseed .
+COPY --from=builder /workspace/build/cosmoseed .
 USER nonroot:nonroot
 ENTRYPOINT ["cosmoseed"]
