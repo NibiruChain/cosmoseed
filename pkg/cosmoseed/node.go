@@ -56,7 +56,7 @@ func NewSeeder(home string, config *Config) (*Seeder, error) {
 		"api-addr", config.ApiAddr,
 		"p2p-addr", config.ListenAddr,
 		"log-level", config.LogLevel,
-		"strict-routing", config.AddrBookStrict,
+		"allow-non-routable", config.AllowNonRoutable,
 		"max-inbound", config.MaxInboundPeers,
 		"max-outbound", config.MaxOutboundPeers,
 		"max-packet-msg-payload-size", config.MaxPacketMsgPayloadSize,
@@ -78,7 +78,7 @@ func NewSeeder(home string, config *Config) (*Seeder, error) {
 	transport := createTransport(nodeKey, p2pConfig)
 
 	// Address book
-	book := pex.NewAddrBook(addrBookPath, config.AddrBookStrict)
+	book := pex.NewAddrBook(addrBookPath, !config.AllowNonRoutable)
 	book.SetLogger(logger)
 
 	// PEX Reactor
@@ -87,7 +87,7 @@ func NewSeeder(home string, config *Config) (*Seeder, error) {
 		splitAndTrimEmpty(p2pConfig.Seeds, ",", " "),
 		config.PeerQueueSize,
 		config.DialWorkers,
-		config.AddrBookStrict,
+		!config.AllowNonRoutable,
 	)
 	pexReactor.SetLogger(logger)
 
@@ -184,7 +184,7 @@ func generateP2PConfig(home string, cfg *Config) *config.P2PConfig {
 	p2pConfig := config.DefaultP2PConfig()
 
 	p2pConfig.AddrBook = path.Join(home, cfg.AddrBookFile)
-	p2pConfig.AddrBookStrict = cfg.AddrBookStrict
+	p2pConfig.AddrBookStrict = !cfg.AllowNonRoutable
 	p2pConfig.Seeds = cfg.Seeds
 	p2pConfig.ListenAddress = cfg.ListenAddr
 	p2pConfig.AllowDuplicateIP = true

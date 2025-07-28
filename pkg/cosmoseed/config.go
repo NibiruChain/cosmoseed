@@ -10,18 +10,18 @@ import (
 )
 
 type Config struct {
-	NodeKeyFile    string `yaml:"nodeKeyFile" default:"node_key.json"`
-	AddrBookFile   string `yaml:"addrBookFile" default:"addrbook.json"`
-	AddrBookStrict bool   `yaml:"addrBookStrict" default:"true"`
+	NodeKeyFile  string `yaml:"nodeKeyFile" default:"node_key.json"`
+	AddrBookFile string `yaml:"addrBookFile" default:"addrbook.json"`
 
-	ListenAddr              string `yaml:"listenAddr" default:"tcp://0.0.0.0:26656"`
-	LogLevel                string `yaml:"logLevel" default:"info"`
-	MaxInboundPeers         int    `yaml:"maxInboundPeers" default:"2000"`
-	MaxOutboundPeers        int    `yaml:"maxOutboundPeers" default:"20"`
-	MaxPacketMsgPayloadSize int    `yaml:"maxPacketMsgPayloadSize" default:"1024"`
+	ListenAddr string `yaml:"listenAddr" default:"tcp://0.0.0.0:26656"`
+	LogLevel   string `yaml:"logLevel" default:"info"`
 
-	PeerQueueSize int `yaml:"peerQueueSize" default:"1000"`
-	DialWorkers   int `yaml:"dialWorkers" default:"20"`
+	MaxInboundPeers         int  `yaml:"maxInboundPeers" default:"2000"`
+	MaxOutboundPeers        int  `yaml:"maxOutboundPeers" default:"20"`
+	MaxPacketMsgPayloadSize int  `yaml:"maxPacketMsgPayloadSize" default:"1024"`
+	AllowNonRoutable        bool `yaml:"allowNonRoutable"`
+	PeerQueueSize           int  `yaml:"peerQueueSize" default:"1000"`
+	DialWorkers             int  `yaml:"dialWorkers" default:"20"`
 
 	ChainID string `yaml:"chainID"`
 	Seeds   string `yaml:"seeds"`
