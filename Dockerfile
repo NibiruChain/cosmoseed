@@ -1,6 +1,12 @@
 FROM golang:1.24-alpine AS builder
 
-RUN apk add make git
+ARG VERSION
+ARG COMMIT
+
+ENV VERSION=$VERSION
+ENV COMMIT=$COMMIT
+
+RUN apk add make
 
 WORKDIR /workspace
 COPY go.mod go.sum* ./

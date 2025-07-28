@@ -92,6 +92,9 @@ jobs:
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            VERSION=v${{ needs.version.outputs.version }}
+            COMMIT=${{ github.sha }}
 
   merge:
     name: Create Multi-arch Cosmoseed Image
