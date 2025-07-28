@@ -16,10 +16,15 @@ type SeedReactor struct {
 
 	book        pex.AddrBook
 	log         log.Logger
-	addrChan    chan *na.NetAddr
+	addrChan    chan *AddrPair
 	quitCh      chan struct{}
 	dialWorkers int
 	strict      bool
+}
+
+type AddrPair struct {
+	Addr   *na.NetAddr
+	Source *na.NetAddr
 }
 
 func NewReactor(book pex.AddrBook, seeds []string, queueSize, dialWorkers int, strict bool) *SeedReactor {
@@ -33,7 +38,7 @@ func NewReactor(book pex.AddrBook, seeds []string, queueSize, dialWorkers int, s
 		Reactor:     r,
 		book:        book,
 		log:         log.NewNopLogger(),
-		addrChan:    make(chan *na.NetAddr, queueSize),
+		addrChan:    make(chan *AddrPair, queueSize),
 		quitCh:      make(chan struct{}),
 		dialWorkers: dialWorkers,
 		strict:      strict,
@@ -88,7 +93,10 @@ func (s *SeedReactor) Receive(e p2p.Envelope) {
 		for _, addr := range addrs {
 			s.log.Debug("received peer address", "addr", addr.DialString())
 			select {
-			case s.addrChan <- addr:
+			case s.addrChan <- &AddrPair{
+				Addr:   addr,
+				Source: e.Src.SocketAddr(),
+			}:
 			default:
 				s.log.Warn("dial queue full, dropping address", "addr", addr.DialString())
 			}
@@ -115,33 +123,36 @@ func (s *SeedReactor) StartDialWorkers(n int) {
 	}
 }
 
-func (s *SeedReactor) processAddr(addr *na.NetAddr) {
+func (s *SeedReactor) processAddr(addr *AddrPair) {
 	if addr == nil {
 		s.log.Debug("ignoring nil address")
 		return
 	}
 
-	if s.strict && !addr.Routable() {
-		s.log.Debug("received peer address not routable. Ignoring", "addr", addr.DialString())
+	if s.strict && !addr.Addr.Routable() {
+		s.log.Debug("received peer address not routable. Ignoring", "addr", addr.Addr.DialString())
 		return
 	}
 
-	if s.Switch.IsDialingOrExistingAddress(addr) {
+	if s.Switch.IsDialingOrExistingAddress(addr.Addr) {
 		s.log.Debug("already dialing or connected", "addr", addr)
 		return
 	}
-	err := s.Reactor.Switch.DialPeerWithAddress(addr)
+	err := s.Reactor.Switch.DialPeerWithAddress(addr.Addr)
 	if err != nil {
 		s.log.Debug("dial failed", "addr", addr, "err", err)
-		s.book.MarkAttempt(addr)
+		s.book.MarkAttempt(addr.Addr)
 		return
 	}
-	s.log.Info("adding/marking good peer", "id", addr.ID, "addr", addr)
-	if err = s.book.AddAddress(addr, nil); err != nil {
+	s.log.Info("adding/marking good peer", "id", addr.Addr.ID, "addr", addr)
+	if addr.Source == nil {
+		addr.Source = s.Switch.NetAddr()
+	}
+	if err = s.book.AddAddress(addr.Addr, addr.Source); err != nil {
 		s.log.Error("failed to add address", "addr", addr, "err", err)
 		return
 	}
-	s.book.MarkGood(addr.ID)
+	s.book.MarkGood(addr.Addr.ID)
 }
 
 func (s *SeedReactor) GetPeerSelection() []*na.NetAddr {
