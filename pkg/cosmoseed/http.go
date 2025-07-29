@@ -1,7 +1,6 @@
 package cosmoseed
 
 import (
-	"encoding/json"
 	"net/http"
 	"strings"
 )
@@ -18,6 +17,5 @@ func (s *Seeder) handlePeers(w http.ResponseWriter, r *http.Request) {
 		peerList = append(peerList, p.String())
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(strings.Join(peerList, ","))
+	w.Write([]byte(strings.Join(peerList, ",")))
 }
