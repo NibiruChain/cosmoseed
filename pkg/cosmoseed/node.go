@@ -64,6 +64,7 @@ func NewSeeder(home string, config *Config) (*Seeder, error) {
 		"max-packet-msg-payload-size", config.MaxPacketMsgPayloadSize,
 		"dial-workers", config.DialWorkers,
 		"peer-queue-size", config.PeerQueueSize,
+		"external-address", config.ExternalAddress,
 	)
 
 	if err := ensurePath(nodeKeyPath); err != nil {
@@ -235,6 +236,7 @@ func generateP2PConfig(home string, cfg *Config) *config.P2PConfig {
 	p2pConfig.MaxNumInboundPeers = cfg.MaxInboundPeers
 	p2pConfig.MaxNumOutboundPeers = cfg.MaxOutboundPeers
 	p2pConfig.MaxPacketMsgPayloadSize = cfg.MaxPacketMsgPayloadSize
+	p2pConfig.ExternalAddress = cfg.ExternalAddress
 
 	return p2pConfig
 }
