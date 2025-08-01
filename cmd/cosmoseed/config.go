@@ -14,8 +14,8 @@ const (
 )
 
 var (
-	home, chainID, seeds, logLevel, nodeKeyFile string
-	showVersion, showNodeID, configReadOnly     bool
+	home, chainID, seeds, logLevel, nodeKeyFile, externalAddress string
+	showVersion, showNodeID, configReadOnly                      bool
 )
 
 func init() {
@@ -46,6 +46,11 @@ func init() {
 		"node-key-file",
 		utils.GetString("NODE_KEY_FILE", ""),
 		"override node key file on config.yaml",
+	)
+	flag.StringVar(&externalAddress,
+		"external-address",
+		utils.GetString("EXTERNAL_ADDRESS", ""),
+		"external address to use in format '<host>:<port>'",
 	)
 
 	flag.BoolVar(&showVersion, "version", false, "print version and exit")

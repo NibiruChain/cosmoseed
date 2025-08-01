@@ -6,7 +6,12 @@ import (
 )
 
 func (s *Seeder) registerRoutes(mux *http.ServeMux) {
+	mux.HandleFunc("/", s.seedAddress)
 	mux.HandleFunc("/peers", s.handlePeers)
+}
+
+func (s *Seeder) seedAddress(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte(s.GetFullAddress()))
 }
 
 func (s *Seeder) handlePeers(w http.ResponseWriter, r *http.Request) {

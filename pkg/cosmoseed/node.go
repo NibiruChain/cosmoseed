@@ -8,6 +8,8 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -178,6 +180,48 @@ func (s *Seeder) Stop() error {
 
 func (s *Seeder) GetNodeID() string {
 	return s.key.ID()
+}
+
+func (s *Seeder) GetP2pAddress() string {
+	if s.cfg.ExternalAddress != "" {
+		if parts := strings.Split(s.cfg.ExternalAddress, ":"); len(parts) == 2 {
+			return parts[0]
+		}
+	}
+
+	localIp, err := getLocalIP()
+	if err == nil {
+		return localIp
+	}
+
+	// If everything above fails just return a default
+	return "0.0.0.0"
+}
+
+func (s *Seeder) GetP2pPort() int {
+	if s.cfg.ExternalAddress != "" {
+		if parts := strings.Split(s.cfg.ExternalAddress, ":"); len(parts) == 2 {
+			port, err := strconv.Atoi(parts[1])
+			if err == nil {
+				return port
+			}
+		}
+	}
+
+	parts := strings.Split(s.cfg.ListenAddr, ":")
+	if len(parts) > 1 {
+		port, err := strconv.Atoi(parts[len(parts)-1])
+		if err == nil {
+			return port
+		}
+	}
+
+	// If everything above fails just return default port
+	return 26656
+}
+
+func (s *Seeder) GetFullAddress() string {
+	return fmt.Sprintf("%s@%s:%d", s.GetNodeID(), s.GetP2pAddress(), s.GetP2pPort())
 }
 
 func generateP2PConfig(home string, cfg *Config) *config.P2PConfig {

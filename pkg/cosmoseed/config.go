@@ -23,8 +23,9 @@ type Config struct {
 	PeerQueueSize           int  `yaml:"peerQueueSize" default:"1000"`
 	DialWorkers             int  `yaml:"dialWorkers" default:"20"`
 
-	ChainID string `yaml:"chainID"`
-	Seeds   string `yaml:"seeds"`
+	ChainID         string `yaml:"chainID"`
+	Seeds           string `yaml:"seeds"`
+	ExternalAddress string `yaml:"externalAddress,omitempty"`
 
 	ApiAddr string `yaml:"apiAddr" default:"0.0.0.0:8080"`
 }

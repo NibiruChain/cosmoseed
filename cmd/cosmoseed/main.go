@@ -53,6 +53,10 @@ func main() {
 		cfg.NodeKeyFile = nodeKeyFile
 	}
 
+	if externalAddress != "" {
+		cfg.ExternalAddress = externalAddress
+	}
+
 	seeder, err := cosmoseed2.NewSeeder(home, cfg)
 	if err != nil {
 		panic(err)
