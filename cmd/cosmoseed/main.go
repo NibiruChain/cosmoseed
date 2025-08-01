@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strconv"
+	"strings"
 
 	cosmoseed2 "github.com/NibiruChain/cosmoseed/pkg/cosmoseed"
 )
@@ -49,12 +51,19 @@ func main() {
 		cfg.LogLevel = logLevel
 	}
 
-	if nodeKeyFile != "" {
-		cfg.NodeKeyFile = nodeKeyFile
-	}
-
 	if externalAddress != "" {
 		cfg.ExternalAddress = externalAddress
+	}
+
+	if podName != "" {
+		cfg.NodeKeyFile = podName
+		if externalAddress != "" {
+			idx, _ := extractIndexFromPodName(podName)
+			parts := strings.Split(externalAddress, ",")
+			if len(parts) > idx {
+				cfg.ExternalAddress = parts[idx]
+			}
+		}
 	}
 
 	seeder, err := cosmoseed2.NewSeeder(home, cfg)
@@ -70,4 +79,17 @@ func main() {
 	if err = seeder.Start(); err != nil {
 		panic(err)
 	}
+}
+
+func extractIndexFromPodName(podName string) (int, error) {
+	parts := strings.Split(podName, "-")
+	if len(parts) == 0 {
+		return 0, fmt.Errorf("invalid pod name: %s", podName)
+	}
+	indexStr := parts[len(parts)-1]
+	index, err := strconv.Atoi(indexStr)
+	if err != nil {
+		return 0, fmt.Errorf("failed to parse index from pod name %q: %w", podName, err)
+	}
+	return index, nil
 }

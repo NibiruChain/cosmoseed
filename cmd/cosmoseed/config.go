@@ -14,8 +14,8 @@ const (
 )
 
 var (
-	home, chainID, seeds, logLevel, nodeKeyFile, externalAddress string
-	showVersion, showNodeID, configReadOnly                      bool
+	home, chainID, seeds, logLevel, externalAddress, podName string
+	showVersion, showNodeID, configReadOnly                  bool
 )
 
 func init() {
@@ -42,15 +42,19 @@ func init() {
 		utils.GetString("LOG_LEVEL", "info"),
 		"logging level",
 	)
-	flag.StringVar(&nodeKeyFile,
-		"node-key-file",
-		utils.GetString("NODE_KEY_FILE", ""),
-		"override node key file on config.yaml",
-	)
 	flag.StringVar(&externalAddress,
 		"external-address",
 		utils.GetString("EXTERNAL_ADDRESS", ""),
-		"external address to use in format '<host>:<port>'",
+		"external address to use in format '<host>:<port>'. "+
+			"When pod-name is set, this can be a list separated by comma and index will be extracted "+
+			"from pod name to chose the correct address (useful on kubernetes StatefulSets)",
+	)
+	flag.StringVar(&podName,
+		"pod-name",
+		utils.GetString("POD_NAME", ""),
+		"name of the pod when running on kubernetes. When set, node-key-file will be set to pod "+
+			"name and index will be extracted from it to pick the right address from"+
+			"external-address list (comma separated) (useful on kubernetes StatefulSets)",
 	)
 
 	flag.BoolVar(&showVersion, "version", false, "print version and exit")
